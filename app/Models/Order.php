@@ -8,6 +8,7 @@ class Order extends Model
 {
     // Ini bagian yang harus ditambahin/dibenerin
     protected $fillable = [
+        'user_id',
         'invoice_number', 
         'total_price', 
         'pay_amount', 

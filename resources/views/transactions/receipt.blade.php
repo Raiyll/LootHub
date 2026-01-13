@@ -79,7 +79,7 @@
     <div class="no-print text-center" style="margin-top: 20px;">
         <button onclick="window.print()">Cetak (Print)</button>
         <br><br>
-        <a href="{{ route('kasir.index') }}">Kembali ke Kasir</a>
+        <a href="{{ route('homepage') }}">Kembali ke Beranda?</a>
     </div>
 </body>
 

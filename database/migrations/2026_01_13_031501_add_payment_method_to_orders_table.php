@@ -9,11 +9,9 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        // admin = bisa akses dashboard & stok, kasir = cuma bisa transaksi
-        $table->string('role')->default('pembeli'); 
+    public function up(): void {
+    Schema::table('orders', function (Blueprint $table) {
+        $table->string('payment_method')->after('total_price')->default('cash');
     });
 }
 
@@ -22,7 +20,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table) {
             //
         });
     }

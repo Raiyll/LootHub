@@ -31,6 +31,14 @@ class DatabaseSeeder extends Seeder
         'stock' => 999
     ]);
 
+    \App\Models\Product::create([
+        'category_id' => $topup->id,
+        'name' => '6000 VP',
+        'game_name' => 'Valorant',
+        'price' => 900000,
+        'stock' => 5000
+    ]);
+
     \App\Models\User::create([
     'name' => 'Admin Ganteng',
     'email' => 'admin@gmail.com',
@@ -43,6 +51,13 @@ class DatabaseSeeder extends Seeder
     'email' => 'kasir@gmail.com',
     'password' => bcrypt('kasir123'),
     'role' => 'kasir'
+]);
+
+\App\Models\User::create([
+    'name' => 'Pembeli Biasa',
+    'email' => 'pembeli@gmail.com',
+    'password' => bcrypt('pembeli123'),
+    'role' => 'pembeli'
 ]);
 }
 }

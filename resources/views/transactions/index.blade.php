@@ -84,7 +84,7 @@
                             <a href="{{ route('cart.clear') }}" class="btn btn-outline-secondary btn-sm w-100 mb-2">Reset Keranjang</a>
                             
                             <button type="button" class="btn btn-success btn-lg w-100 shadow" data-bs-toggle="modal" data-bs-target="#modalCheckout" {{ $total == 0 ? 'disabled' : '' }}>
-                                BAYAR SEKARANG
+                                Checkout
                             </button>
                         </div>
                     </div>
@@ -118,7 +118,7 @@
                     </div>
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-success px-4 fw-bold">PROSES SEKARANG</button>
+                        <button type="submit" class="btn btn-success px-4 fw-bold">Checkout</button>
                     </div>
                 </form>
             </div>
