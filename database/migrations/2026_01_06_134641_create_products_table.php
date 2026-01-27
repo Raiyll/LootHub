@@ -9,15 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+ public function up()
 {
     Schema::create('products', function (Blueprint $table) {
         $table->id();
-        $table->foreignId('category_id')->constrained()->onDelete('cascade');
-        $table->string('name'); 
-        $table->string('game_name')->nullable(); // Mobile Legends, Valorant, dll
+        $table->string('name'); // Contoh: "100 Diamonds"
+        $table->string('game_name')->nullable(); // Contoh: "Mobile Legends"
         $table->integer('price');
-        $table->integer('stock')->default(0); 
+        $table->integer('stock');
+        $table->string('image')->nullable();
+        $table->foreignId('category_id')->constrained();
+        $table->softDeletes(); // Wajib buat fitur Soft Deletes lu
         $table->timestamps();
     });
 }

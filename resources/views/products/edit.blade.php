@@ -7,7 +7,7 @@
             Edit Produk: {{ $product->name }}
         </div>
         <div class="card-body">
-            <form action="{{ route('products.update', $product->id) }}" method="POST">
+            <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data"> 
                 @csrf
                 @method('PUT') <div class="mb-3">
                     <label class="form-label">Nama Produk</label>
@@ -18,9 +18,9 @@
                     <label class="form-label">Kategori</label>
                     <select name="category_id" class="form-select" required>
                         @foreach($categories as $cat)
-                            <option value="{{ $cat->id }}" {{ $product->category_id == $cat->id ? 'selected' : '' }}>
-                                {{ $cat->name }}
-                            </option>
+                        <option value="{{ $cat->id }}" {{ $product->category_id == $cat->id ? 'selected' : '' }}>
+                            {{ $cat->name }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -38,6 +38,11 @@
                 <div class="mb-3">
                     <label class="form-label">Stok</label>
                     <input type="number" name="stock" class="form-control" value="{{ $product->stock }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="image" class="form-label fw-bold">Gambar Produk</label>
+                    <input type="file" name="image" class="form-control" id="image" accept="image/*">
+                    <small class="text-muted">Format: jpg, png, jpeg. Maks: 2MB</small>
                 </div>
 
                 <div class="d-flex gap-2">

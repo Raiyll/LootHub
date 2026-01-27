@@ -7,14 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class OrderItem extends Model
 {
     protected $fillable = [
-        'order_id', 
-        'product_id', 
-        'qty', 
-        'price'
+        'order_id',
+        'product_id',
+        'qty',
+        'price',
+        'player_data'
     ];
 
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        // Ini biar ID Player tetep muncul bareng nama produknya meski barangnya udah diapus admin
+        return $this->belongsTo(Product::class)->withTrashed();
     }
 }

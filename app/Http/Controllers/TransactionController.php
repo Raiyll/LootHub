@@ -14,64 +14,78 @@ class TransactionController extends Controller
 {
 
     // Masukin barang ke keranjang (simpen di session)
-    public function addToCart($id)
+    // Tambahkan "Request $request" di dalam kurung
+    public function addToCart(Request $request, $id)
     {
         $product = Product::findOrFail($id);
         $cart = session()->get('cart', []);
 
-        if (isset($cart[$id])) {
-            $cart[$id]['quantity']++;
+        // Ambil data player dari form
+        $playerData = $request->input('player_data');
+
+        // Buat KEY unik agar user bisa beli produk yang sama tapi untuk ID game berbeda
+        // Kalau nggak pakai key unik, ID game yang pertama bakal ketiban
+        $cartKey = $id . ($playerData ? '_' . md5($playerData) : '');
+
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity']++;
         } else {
-            $cart[$id] = [
+            $cart[$cartKey] = [
+                "product_id" => $id,
                 "name" => $product->name,
                 "quantity" => 1,
-                "price" => $product->price
+                "price" => $product->price,
+                "game_name" => $product->game_name,
+                "player_data" => $playerData // Simpan ID game di sini
             ];
         }
 
         session()->put('cart', $cart);
-        // Lempar langsung ke halaman keranjang
         return redirect()->route('cart.index')->with('success', 'Produk masuk keranjang!');
     }
-
     // Proses Bayar
     public function checkout(Request $request)
     {
         $cart = session()->get('cart');
-    if (!$cart) return redirect()->back()->with('error', 'Keranjang kosong!');
+        if (!$cart) return redirect()->back()->with('error', 'Keranjang kosong!');
 
-    // Tambahkan validasi payment_method
-    $request->validate([
-        'payment_method' => 'required'
-    ]);
+        $request->validate([
+            'payment_method' => 'required'
+        ]);
 
-    $totalPrice = 0;
-    foreach ($cart as $details) {
-        $totalPrice += $details['price'] * $details['quantity'];
-    }
-
-    $order = Order::create([
-        'user_id'        => Auth::id(),
-        'invoice_number' => 'INV-' . date('Ymd') . '-' . strtoupper(uniqid()),
-        'total_price'    => $totalPrice,
-        'payment_method' => $request->payment_method, // SIMPAN DISINI
-        'pay_amount'     => $totalPrice,
-        'change_amount'  => 0,
-    ]);
-
-        foreach ($cart as $id => $details) {
-            OrderItem::create([
-                'order_id'   => $order->id,
-                'product_id' => $id,
-                'qty'        => $details['quantity'], // GANTI DISINI: dari 'quantity' jadi 'qty'
-                'price'      => $details['price'],
-            ]);
-
-            // Potong stok
-            \App\Models\Product::find($id)->decrement('stock', $details['quantity']);
+        $totalPrice = 0;
+        foreach ($cart as $details) {
+            $totalPrice += $details['price'] * $details['quantity'];
         }
 
-        // Di akhir fungsi checkout
+        $order = Order::create([
+            'user_id'        => Auth::id(),
+            'invoice_number' => 'INV-' . date('Ymd') . '-' . strtoupper(uniqid()),
+            'total_price'    => $totalPrice,
+            'payment_method' => $request->payment_method,
+            'pay_amount'     => $totalPrice,
+            'change_amount'  => 0,
+        ]);
+
+        foreach ($cart as $key => $details) {
+            $realProductId = $details['product_id'];
+
+            OrderItem::create([
+                'order_id'   => $order->id,
+                'product_id' => $realProductId,
+                'qty'        => $details['quantity'],
+                'price'      => $details['price'],
+                // Simpan ID Player di sini agar Admin tahu akun mana yang harus di-top up
+                'player_data' => $details['player_data'] ?? null,
+            ]);
+
+            // Potong stok dengan aman
+            $product = \App\Models\Product::find($realProductId);
+            if ($product) {
+                $product->decrement('stock', $details['quantity']);
+            }
+        }
+
         session()->forget('cart');
 
         if (Auth::user() && Auth::user()->role == 'admin') {
@@ -122,18 +136,25 @@ class TransactionController extends Controller
     }
 
     public function homepage()
-{
-    $gameProducts = Product::whereNotNull('game_name')->get();
-    $physicalProducts = Product::whereNull('game_name')->get();
-    $categories = Category::with('products')->get();
+    {
+        $gameProducts = Product::whereNotNull('game_name')->get();
+        $physicalProducts = Product::whereNull('game_name')->get();
+        $categories = Category::with('products')->get();
 
-    return view('user.homepage', compact('gameProducts', 'physicalProducts', 'categories'));
-}
+        return view('user.homepage', compact('gameProducts', 'physicalProducts', 'categories'));
+    }
 
     public function showCart()
     {
         $cart = session()->get('cart', []);
-        return view('user.cart', compact('cart'));
+
+        // Hitung total di sini biar lebih aman
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+
+        return view('user.cart', compact('cart', 'total'));
     }
     public function myOrders()
     {
