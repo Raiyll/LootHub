@@ -83,7 +83,7 @@
         </div>
 
         <div class="col-lg-4">
-            <form action="{{ route('checkout') }}" method="POST" id="checkoutForm">
+            <form action="{{ route('checkout.index') }}" method="GET" id="checkoutForm">
                 @csrf
                 <input type="hidden" name="payment_method" id="selected_method" required>
 
@@ -141,7 +141,7 @@
                             </button>
                         @else
                             <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow border-0" style="border-radius: 12px; background-color: #0d6efd;">
-                                CHECKOUT SEKARANG
+                                CHECKOUT
                             </button>
                         @endif
                     </div>

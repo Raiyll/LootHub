@@ -114,4 +114,14 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil dipulihkan!');
     }
+
+    public function categoryHub()
+{
+    // Ambil kategori beserta produk yang belum di-soft delete
+    $categories = Category::with(['products' => function($q) {
+        $q->whereNull('deleted_at'); 
+    }])->get();
+
+    return view('user.category', compact('categories'));
+}
 }

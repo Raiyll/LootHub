@@ -7,7 +7,7 @@
     use App\Http\Controllers\CategoryController;
     use App\Http\Controllers\AuthController;
     use App\Http\Controllers\GoogleController;
-
+    use App\Http\Controllers\CheckoutController;    
     // --- PUBLIC ROUTES ---
     Route::get('/', [HomeController::class, 'index'])->name('homepage');
     Route::get('/category/{name}', [HomeController::class, 'category'])->name('category.show');
@@ -26,19 +26,21 @@
     // --- AUTH ROUTES ---
     Route::middleware('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
+        Route::get('/category-hub', [ProductController::class, 'categoryHub'])->name('category.hub');
         Route::get('/cart', [TransactionController::class, 'showCart'])->name('cart.index');
         Route::post('/add-to-cart/{id}', [TransactionController::class, 'addToCart'])->name('cart.add');
         Route::post('/checkout', [TransactionController::class, 'checkout'])->name('checkout');
         Route::get('/my-orders', [TransactionController::class, 'myOrders'])->name('orders.index');
         Route::get('/receipt/{id}', [TransactionController::class, 'receipt'])->name('transaction.receipt');
         Route::post('/clear-cart', [TransactionController::class, 'clearCart'])->name('cart.clear');
+        Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+        Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 
         // --- ADMIN ONLY ---
         Route::middleware('role:admin')->group(function () {
             Route::get('/dashboard', [TransactionController::class, 'dashboard'])->name('dashboard');
             Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
-          Route::resource('products', ProductController::class)->except(['show']);
+            Route::resource('products', ProductController::class)->except(['show']);
             Route::resource('categories', CategoryController::class);
             Route::get('/history', [TransactionController::class, 'history'])->name('transaction.history');
         });

@@ -80,7 +80,7 @@
                         @empty
                         <div class="text-center py-4">
                             <i class="bi bi-check-circle text-success d-block h1"></i>
-                            <p class="text-muted mb-0">Semua stok aman! ✅</p>
+                            <p class="text-muted mb-0">Semua stok aman</p>
                         </div>
                         @endforelse
                     </ul>
