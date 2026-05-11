@@ -43,68 +43,13 @@ class TransactionController extends Controller
         session()->put('cart', $cart);
         return redirect()->route('cart.index')->with('success', 'Produk masuk keranjang!');
     }
-    // Proses Bayar
-    public function checkout(Request $request)
-    {
-        $cart = session()->get('cart');
-        if (!$cart) return redirect()->back()->with('error', 'Keranjang kosong!');
 
-        $request->validate([
-            'payment_method' => 'required'
-        ]);
-
-        $totalPrice = 0;
-        foreach ($cart as $details) {
-            $totalPrice += $details['price'] * $details['quantity'];
-        }
-
-        $order = Order::create([
-            'user_id'        => Auth::id(),
-            'invoice_number' => 'INV-' . date('Ymd') . '-' . strtoupper(uniqid()),
-            'total_price'    => $totalPrice,
-            'payment_method' => $request->payment_method,
-            'pay_amount'     => $totalPrice,
-            'change_amount'  => 0,
-        ]);
-
-        foreach ($cart as $key => $details) {
-            $realProductId = $details['product_id'];
-
-            OrderItem::create([
-                'order_id'   => $order->id,
-                'product_id' => $realProductId,
-                'qty'        => $details['quantity'],
-                'price'      => $details['price'],
-                // Simpan ID Player di sini agar Admin tahu akun mana yang harus di-top up
-                'player_data' => $details['player_data'] ?? null,
-            ]);
-
-            // Potong stok dengan aman
-            $product = \App\Models\Product::find($realProductId);
-            if ($product) {
-                $product->decrement('stock', $details['quantity']);
-            }
-        }
-
-        session()->forget('cart');
-
-        if (Auth::user() && Auth::user()->role == 'admin') {
-            return redirect()->route('dashboard')->with('success', 'Transaksi Berhasil dicatat!');
-        }
-
-        return redirect()->route('homepage')->with('success', 'Pesanan lo berhasil, Bre!');
-    }
     public function clearCart()
     {
         session()->forget('cart');
         return redirect()->back();
     }
 
-    public function receipt($id)
-    {
-        $order = \App\Models\Order::with('items.product')->findOrFail($id);
-        return view('transactions.receipt', compact('order'));
-    }
 
     public function history()
     {

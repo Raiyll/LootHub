@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Product; 
+use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth; // Tambahin ini biar panggil ID lebih aman
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CheckoutController extends Controller
@@ -24,7 +24,6 @@ class CheckoutController extends Controller
         $total = 0;
         foreach ($cart as $details) {
             if (isset($details['product_id'])) {
-                // Sesuai request lu pake soft deletes, kita pake withTrashed [cite: 2026-01-13]
                 $product = Product::withTrashed()->find($details['product_id']);
                 if ($product && !$product->trashed()) {
                     $total += $details['price'] * $details['quantity'];
@@ -38,31 +37,36 @@ class CheckoutController extends Controller
     public function process(Request $request)
     {
         $cart = session()->get('cart', []);
-        if(empty($cart)) return redirect()->route('homepage');
+        if (empty($cart)) return redirect()->route('homepage');
 
         $request->validate([
-            'payment_method' => 'required'
+            'payment_method' => 'required',
+            'pay_amount' => 'required_if:payment_method,Tunai|numeric'
         ]);
 
         try {
-            DB::transaction(function () use ($cart, $request) {
-                $userId = Auth::id();
+            $orderId = null;
 
-                $totalPrice = array_sum(array_map(function($item) {
+            DB::transaction(function () use ($cart, $request, &$orderId) {
+                $totalPrice = array_sum(array_map(function ($item) {
                     return ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
                 }, $cart));
 
-                // Simpan ke tabel orders (sesuai kolom pada migration)
+                $received = ($request->payment_method === 'Tunai') ? $request->pay_amount : $totalPrice;
+                $change = $received - $totalPrice;
+
                 $order = Order::create([
-                    'user_id' => $userId,
+                    'user_id' => Auth::id(),
                     'invoice_number' => 'INV-' . date('Ymd') . '-' . strtoupper(uniqid()),
                     'total_price' => $totalPrice,
-                    'payment_method' => $request->payment_method ?? 'cash',
-                    'pay_amount' => $totalPrice,
-                    'change_amount' => 0,
+                    'payment_method' => $request->payment_method,
+                    'pay_amount' => $received,
+                    'change_amount' => $change,
                 ]);
 
-                foreach ($cart as $key => $details) {
+                $orderId = $order->id;
+
+                foreach ($cart as $details) {
                     OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $details['product_id'],
@@ -80,11 +84,33 @@ class CheckoutController extends Controller
 
             session()->forget('cart');
 
-            return redirect()->route('homepage')->with('success', 'Transaksi berhasil. Stok berkurang dan pesanan disimpan.');
+            // Gunakan route name yang konsisten: transaction.receipt
+            return redirect()->route('transaction.receipt', $orderId)
+                ->with('success', 'Transaksi Berhasil!');
 
         } catch (\Exception $e) {
             Log::error('Checkout Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Gagal memproses pesanan.');
         }
+    }
+
+    /**
+     * Method Receipt Pindahan dari TransactionController
+     */
+    public function receipt($id)
+    {
+        // Load relasi product termasuk yang di-soft delete agar struk tetap lengkap
+        $order = Order::with(['items.product' => function($query) {
+            $query->withTrashed();
+        }])->findOrFail($id);
+
+        // Security: Hanya pemilik order atau Admin yang bisa akses struk ini
+        if ($order->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
+            abort(403, 'Akses ditolak.');
+        }
+
+        // Sesuaikan nama view dengan lokasi file struk lu
+        // Kalau di resources/views/transactions/receipt.blade.php gunakan:
+        return view('transactions.receipt', compact('order'));
     }
 }

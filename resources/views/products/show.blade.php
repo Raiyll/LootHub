@@ -1,5 +1,25 @@
 @extends('layouts.app')
 
+<style>
+     :root {
+            --primary-color: #4ee6b3;
+            --secondary-color: #ff3399;
+            --dark-bg: #111827;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+         .price-tag {
+            background: #ff3399;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            font-size: 1.4rem;
+        }
+</style>
+
 @section('content')
 <div class="container mt-5">
     <nav aria-label="breadcrumb" class="mb-4">
@@ -26,9 +46,9 @@
                 <span class="badge bg-primary mb-2 px-3 rounded-pill text-uppercase">
                     {{ $product->category->name ?? 'Uncategorized' }}
                 </span>
-                
+
                 <h1 class="fw-bold mb-1 text-dark display-5">{{ $product->name }}</h1>
-                
+
                 @if($product->game_name)
                     <p class="text-muted fs-5 mb-4"><i class="bi bi-controller me-2"></i>Edisi Khusus: <strong>{{ $product->game_name }}</strong></p>
                 @else
@@ -37,7 +57,7 @@
 
                 <div class="p-4 bg-light rounded-4 border-start border-4 border-primary mb-4">
                     <small class="text-muted d-block">Harga:</small>
-                    <h2 class="text-primary fw-bold display-6 mb-0">Rp {{ number_format($product->price) }}</h2>
+                    <h2 class="price-tag fw-bold display-6 mb-0">Rp {{ number_format($product->price) }}</h2>
                 </div>
 
                 <div class="card border-0 bg-white shadow-sm p-4 mb-4 rounded-4">
@@ -61,7 +81,7 @@
                 @if($product->stock > 0)
                     <form action="{{ route('cart.add', $product->id) }}" method="POST">
                         @csrf
-                        
+
                         {{-- KONDISI KHUSUS TOP UP: Muncul kalo ada game_name --}}
                         @if($product->game_name)
                             <div class="card border-0 bg-primary bg-opacity-10 p-4 mb-4 rounded-4 border-start border-4 border-primary">
@@ -70,7 +90,7 @@
                                 </h6>
                                 <div class="mb-2">
                                     <label class="small fw-bold text-muted mb-1">User ID & Server</label>
-                                    <input type="text" name="player_data" class="form-control form-control-lg rounded-3 border-0 shadow-sm" 
+                                    <input type="text" name="player_data" class="form-control form-control-lg rounded-3 border-0 shadow-sm"
                                            placeholder="Contoh: 12345678 (2026)" required>
                                 </div>
                                 <small class="text-muted" style="font-size: 0.8rem;">
@@ -100,12 +120,12 @@
 </div>
 
 <style>
-    .main-product-img { 
-        width: 100%; 
-        height: 500px; 
+    .main-product-img {
+        width: 100%;
+        height: 500px;
         object-fit: contain; /* Pake contain biar gear lu kelihat utuh gak kepotong */
         background-color: #f8f9fa;
-        transition: transform 0.5s ease; 
+        transition: transform 0.5s ease;
     }
     .shadow-hover:hover .main-product-img { transform: scale(1.05); }
     .hover-up:hover { transform: translateY(-3px); transition: 0.3s; }
