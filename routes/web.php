@@ -7,7 +7,10 @@
     use App\Http\Controllers\CategoryController;
     use App\Http\Controllers\AuthController;
     use App\Http\Controllers\GoogleController;
-    use App\Http\Controllers\CheckoutController;    
+    use App\Http\Controllers\CheckoutController;
+    use App\Http\Controllers\WishlistController;
+    use App\Http\Controllers\DashboardController;
+
     // --- PUBLIC ROUTES ---
     Route::get('/', [HomeController::class, 'index'])->name('homepage');
     Route::get('/category/{name}', [HomeController::class, 'category'])->name('category.show');
@@ -35,13 +38,16 @@
         Route::post('/clear-cart', [TransactionController::class, 'clearCart'])->name('cart.clear');
         Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
         Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+        Route::post('/wishlist/add/{product_id}', [WishlistController::class, 'store'])->name('wishlist.add');
+        Route::delete('/wishlist/remove/{id}', [WishlistController::class, 'destroy'])->name('wishlist.remove');
 
         // --- ADMIN ONLY ---
-        Route::middleware('role:admin')->group(function () {
-            Route::get('/dashboard', [TransactionController::class, 'dashboard'])->name('dashboard');
-            Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
-            Route::resource('products', ProductController::class)->except(['show']);
-            Route::resource('categories', CategoryController::class);
-            Route::get('/history', [TransactionController::class, 'history'])->name('transaction.history');
-        });
+            Route::middleware('role:admin')->group(function () {
+                Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+                Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
+                Route::resource('products', ProductController::class)->except(['show']);
+                Route::resource('categories', CategoryController::class);
+                Route::get('/history', [TransactionController::class, 'history'])->name('transaction.history');
+            });
     });

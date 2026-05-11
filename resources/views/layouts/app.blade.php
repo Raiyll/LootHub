@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LootHub - Gaming Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
+    @stack('styles')
     <style>
         :root {
             --dark-sidebar: #0f172a;
@@ -22,7 +23,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Syne', sans-serif;
             background-color: #f1f5f9;
             color: #1a1a1a;
             overflow-x: hidden;
@@ -329,6 +330,11 @@
                     <i class="bi bi-receipt"></i> <span>Pesanan Saya</span>
                 </a>
             </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ route('wishlist.index') }}" class="sidebar-nav-link {{ request()->is('wishlist') ? 'active' : '' }}">
+                    <i class="bi bi-heart-fill"></i> <span>Wishlist</span>
+                </a>
+            </li>
 
             @auth
             @if(Auth::user()->role == 'admin')
@@ -383,6 +389,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
     <script>
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
@@ -393,7 +400,7 @@
         // Load saved sidebar state on page load
         window.addEventListener('DOMContentLoaded', () => {
             const sidebarState = localStorage.getItem('sidebarState');
-            
+
             // Only apply mini state on desktop
             if (window.innerWidth > 991) {
                 if (sidebarState === 'mini') {
@@ -407,7 +414,7 @@
         toggleSidebar.onclick = () => {
             sidebar.classList.toggle('mini');
             mainContent.classList.toggle('expanded');
-            
+
             // Save state to localStorage
             const isMini = sidebar.classList.contains('mini');
             localStorage.setItem('sidebarState', isMini ? 'mini' : 'full');

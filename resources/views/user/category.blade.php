@@ -281,7 +281,7 @@
     }
 
     .price-tag {
-        color: var(--accent-blue);
+        color: var(--secondary-pink);
         font-weight: 900;
         font-size: 1.5rem;
         letter-spacing: -0.5px;
