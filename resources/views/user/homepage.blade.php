@@ -222,7 +222,6 @@
     </div>
 
     <style>
-        /* === ROOT VARIABLES === */
         :root {
             --primary-color: #4ee6b3;
             --secondary-color: #ff3399;
@@ -233,7 +232,7 @@
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
 
-        /* === ENHANCED CAROUSEL === */
+        /* === CAROUSEL === */
         .parallax-wrapper {
             position: relative;
             overflow: hidden;
@@ -278,7 +277,7 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        /* === ANIMATION CLASSES === */
+        /* === ini animasi === */
         .slide-in-left {
             animation: slideInLeft 0.8s ease-out;
         }
@@ -327,7 +326,7 @@
             }
         }
 
-        /* === GLOWING EFFECTS === */
+        /* === efek glowing === */
         .glow-text {
             text-shadow: 0 0 20px rgba(78, 230, 179, 0.5),
                 0 0 40px rgba(78, 230, 179, 0.3);
@@ -387,7 +386,7 @@
             box-shadow: 0 10px 25px rgba(78, 230, 179, 0.4);
         }
 
-        /* === FLOATING PARTICLES === */
+        /* === partikel loh ya === */
         .particles-container {
             position: fixed;
             top: 0;
@@ -459,7 +458,7 @@
             }
         }
 
-        /* === CATEGORY SECTION === */
+        /* === section category mas === */
         .category-section {
             position: relative;
             z-index: 1;
@@ -492,7 +491,7 @@
             font-size: 0.85rem;
         }
 
-        /* === PRODUCT CARDS === */
+        /* === card produk woi === */
         .product-wrapper {
             position: relative;
             padding: 0 50px;
@@ -545,7 +544,7 @@
                 0 0 30px rgba(255, 51, 153, 0.2);
         }
 
-        /* === PRODUCT IMAGE === */
+        /* === image product === */
         .img-container {
             position: relative;
             overflow: hidden;
@@ -696,7 +695,7 @@
             box-shadow: 0 5px 20px rgba(78, 230, 179, 0.4);
         }
 
-        /* === SCROLL BUTTONS === */
+        /* === tombol scroll === */
         .scroll-btn {
             position: absolute;
             top: 50%;
